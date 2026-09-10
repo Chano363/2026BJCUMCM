@@ -1,0 +1,25 @@
+ok = False
+issues = 22
+{"severity": "FAIL", "message": "process_q1_gridconv.png ���� 300 DPI"}
+{"severity": "FAIL", "message": "process_q1_picard.png ���� 300 DPI"}
+{"severity": "FAIL", "message": "raw_q1_env_T_C.png ���� 300 DPI"}
+{"severity": "FAIL", "message": "raw_q2_radius.png ���� 300 DPI"}
+{"severity": "FAIL", "message": "result_q1_profile.png ���� 300 DPI"}
+{"severity": "FAIL", "message": "result_q3_q4_combined.png ���� 300 DPI"}
+{"severity": "FAIL", "message": "process_q1_gridconv ȱ����Ը�ʽ��.svg"}
+{"severity": "FAIL", "message": "process_q1_picard ȱ����Ը�ʽ��.svg"}
+{"severity": "FAIL", "message": "raw_q1_env_T_C ȱ����Ը�ʽ��.svg"}
+{"severity": "FAIL", "message": "raw_q2_radius ȱ����Ը�ʽ��.svg"}
+{"severity": "FAIL", "message": "result_q1_profile ȱ����Ը�ʽ��.svg"}
+{"severity": "FAIL", "message": "result_q3_q4_combined ȱ����Ը�ʽ��.svg"}
+{"severity": "FAIL", "message": "raw_ ���ѡͼ�� 2 �ţ�����ÿ����� 3 ��"}
+{"severity": "FAIL", "message": "process_ ���ѡͼ�� 2 �ţ�����ÿ����� 3 ��"}
+{"severity": "FAIL", "message": "result_ ���ѡͼ�� 2 �ţ�����ÿ����� 3 ��"}
+{"severity": "FAIL", "message": "������ q2 ȱ�� process_ ���ѡͼ"}
+{"severity": "FAIL", "message": "������ q2 ȱ�� result_ ���ѡͼ"}
+{"severity": "FAIL", "message": "������ q3 ȱ�� raw_ ���ѡͼ"}
+{"severity": "FAIL", "message": "������ q3 ȱ�� process_ ���ѡͼ"}
+{"severity": "FAIL", "message": "������ q4 ȱ�� raw_ ���ѡͼ"}
+{"severity": "FAIL", "message": "������ q4 ȱ�� process_ ���ѡͼ"}
+{"severity": "FAIL", "message": "������ q4 ȱ�� result_ ���ѡͼ"}
+其他键: []

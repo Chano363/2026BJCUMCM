@@ -1,5 +1,5 @@
 {
-  "stage": "q4",
+  "stage": "tables",
   "N": 160,
   "dt": 1.0,
   "steady": "plateau",
@@ -12,14 +12,12 @@
     "附件2.xlsx": "5563ACBFA4B4AFB1",
     "A题.pdf": "052D8014BFF5727C"
   },
-  "q4": {
-    "rdot": "pchip",
-    "t_dry_s": 175211.63355387823,
-    "t_dry_h": 48.6699,
-    "R_end_cm": 1.198,
-    "C_center_end": 0.12143033440556307,
-    "reached": true,
-    "wall_s": 174.2
-  },
-  "total_wall_s": 176.16
+  "paper_tables": [
+    "表1.csv",
+    "表2.csv",
+    "表3.csv",
+    "表4.csv",
+    "表5.csv",
+    "表6.csv"
+  ]
 }

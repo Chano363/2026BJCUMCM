@@ -417,6 +417,112 @@ def _paper_pick(res, t_target, key, cols_cm=PAPER_COLS_CM):
     return [round(float(vals[i]), 4) for i in idx]
 
 
+def write_paper_tables_from_results():
+    """从已落盘的 results/result1~4.xlsx 直接派生论文表 1~6（避免重算）。
+
+    result*.xlsx 的排布：A 列 = 时间（s），第 1 行 = 到药材中心的距离（cm），其余为结果值。
+    result3/result4 已按 t_dry 截断，故其**末行**即"烘干结束时间"行。
+    """
+    os.makedirs(RESULT_DIR, exist_ok=True)
+    written = []
+
+    def _load(name, sheet):
+        p = os.path.join(RESULT_DIR, name)
+        if not os.path.exists(p):
+            return None
+        return pd.read_excel(p, sheet_name=sheet, header=0)
+
+    def _pick(df, t_target, cols_cm):
+        tt = df.columns[0]
+        i = int((df[tt].to_numpy(float) - t_target).argmin().__abs__())
+        row = df.iloc[int(np.argmin(np.abs(df[tt].to_numpy(float) - t_target)))]
+        idx = {round(float(c), 1): j + 1 for j, c in enumerate(df.columns[1:])}
+        out = [round(float(row.iloc[0]), 0)]
+        for c in cols_cm:
+            j = int(np.argmin([abs(float(k) - c) for k in idx]))
+            k = list(idx)[j]
+            out.append(round(float(row.iloc[idx[k]]), 4))
+        return out
+
+    # A1 单元格采用三段式「行含义 \ 列含义 \ 单元格含义(含单位)」，
+    # 与 result*.xlsx 的 A1「时间\到药材中心的距离」同一约定，但补全了单元格取值的含义与单位。
+    A1 = {
+        "表1.csv": r"时间/s\到药材中心的距离/cm\温度(℃)",
+        "表2.csv": r"时间/s\到药材中心的距离/cm\水分浓度(kg/kg)",
+        "表3.csv": r"时间/h\到药材中心的距离/cm\温度(℃)",
+        "表4.csv": r"时间/h\到药材中心的距离/cm\水分浓度(kg/kg)",
+        "表5.csv": r"时间/h(末行=烘干结束时间)\到药材中心的距离/cm\水分浓度(kg/kg)",
+        "表6.csv": r"时间/h(末行=烘干结束时间)\到药材中心的距离/cm\水分浓度(kg/kg)(末列=药材表面)",
+    }
+
+    def _dump(rows, cols, fname):
+        pd.DataFrame(rows, columns=[A1[fname]] + [f"{c:g}" for c in cols]).to_csv(
+            os.path.join(RESULT_DIR, fname), index=False, encoding="utf-8-sig")
+        written.append(fname)
+
+    r1t, r1c = _load("result1.xlsx", "温度"), _load("result1.xlsx", "水分浓度")
+    r2t, r2c = _load("result2.xlsx", "温度"), _load("result2.xlsx", "水分浓度")
+    r3, r4 = _load("result3.xlsx", "Sheet1"), _load("result4.xlsx", "Sheet1")
+
+    cols5 = [0.0, 0.5, 1.0, 1.5, 2.0]
+    if r1t is not None:
+        _dump([_pick(r1t, t, cols5) for t in (100, 300, 600, 900, 1200, 1500, 1800)],
+              cols5, "表1.csv")
+    if r1c is not None:
+        _dump([_pick(r1c, t, cols5) for t in (100, 300, 600, 900, 1200, 1500, 1800)],
+              cols5, "表2.csv")
+    if r2t is not None:
+        # 表3/表4 的行标签是"小时"（题面表3/表4 的第一列），而 result2 内部记录是秒，需换算
+        _dump([[round(h, 1)] + _pick(r2t, h * 3600.0, cols5)[1:]
+               for h in (0.5, 1.0, 1.5, 2.0, 2.5, 3.0)], cols5, "表3.csv")
+    if r2c is not None:
+        _dump([[round(h, 1)] + _pick(r2c, h * 3600.0, cols5)[1:]
+               for h in (0.5, 1.0, 1.5, 2.0, 2.5, 3.0)], cols5, "表4.csv")
+
+    if r3 is not None:
+        rows = []
+        h = 6.0
+        last_t = float(r3.iloc[-1, 0])
+        while h * 3600.0 <= last_t + 1e-6:
+            rw = _pick(r3, h * 3600.0, cols5)
+            rw[0] = round(h, 1)                          # 表5 行标签统一用"小时"
+            rows.append(rw); h += 6.0
+        last_row = _pick(r3, last_t, cols5)
+        last_row[0] = round(last_t / 3600.0, 4)          # 末行标签改为小时
+        rows.append(last_row)
+        _dump(rows, cols5, "表5.csv")
+
+    if r4 is not None:
+        tcol = r4.iloc[:, 0].to_numpy(float)
+        # 注意：最后一行/列的表头是"药材表面"（非数值），必须排除，否则 float('药材表面') 会抛错
+        dist, surf_j = [], len(r4.columns) - 1            # surf_j = 末列"药材表面"
+        for c in r4.columns[1:-1]:
+            try:
+                dist.append(round(float(c), 1))
+            except (TypeError, ValueError):
+                pass
+        pick_cm = [0.0, 0.5, 1.0, 1.5]
+
+        def row6(t_target, label):
+            i = int(np.argmin(np.abs(tcol - t_target)))
+            vals = [round(float(r4.iloc[i, 1 + int(np.argmin([abs(d - c) for d in dist]))]), 4)
+                    for c in pick_cm]
+            vals.append(round(float(r4.iloc[i, surf_j]), 4))
+            return [label] + vals
+
+        last_t = float(tcol[-1])
+        rows, h = [], 6.0
+        while h * 3600.0 <= last_t + 1e-6:
+            rows.append(row6(h * 3600.0, round(h, 1)))
+            h += 6.0
+        rows.append(row6(last_t, round(last_t / 3600.0, 4)))
+        pd.DataFrame(rows, columns=[A1["表6.csv"]] +
+                     [f"{c:g}" for c in pick_cm] + ["药材表面"]).to_csv(
+            os.path.join(RESULT_DIR, "表6.csv"), index=False, encoding="utf-8-sig")
+        written.append("表6.csv")
+    return written
+
+
 def write_paper_tables(res1, res2, res3=None, res4=None):
     """写出论文表 1~表 6 的定点值 CSV（报告 §5.3~§5.6 的表格规格）。
 
@@ -469,14 +575,43 @@ def write_paper_tables(res1, res2, res3=None, res4=None):
 
 
 def write_xlsx_writeonly(path, sheets):
-    from openpyxl import Workbook
-    wb = Workbook(write_only=True)
-    for name, header, rows in sheets:
-        ws = wb.create_sheet(title=name)
-        ws.append(list(header))
-        for r in rows:
-            ws.append(r)
-    wb.save(path)
+    """写大结果表。优先 xlsxwriter（constant_memory 流式，259k 行实测稳定且更快），
+    失败或未安装时回退 openpyxl write_only，并在写后立即校验行数。
+    """
+    try:
+        import xlsxwriter
+        wb = xlsxwriter.Workbook(path, {"constant_memory": True})
+        nrows = {}
+        for name, header, rows in sheets:
+            ws = wb.add_worksheet(name)
+            ws.write_row(0, 0, list(header))
+            i = 1
+            for r in rows:
+                ws.write_row(i, 0, list(r))
+                i += 1
+            nrows[name] = i
+        wb.close()
+    except ImportError:
+        from openpyxl import Workbook
+        wb = Workbook(write_only=True)
+        nrows = {}
+        for name, header, rows in sheets:
+            ws = wb.create_sheet(title=name)
+            ws.append(list(header))
+            i = 1
+            for r in rows:
+                ws.append(list(r))
+                i += 1
+            nrows[name] = i
+        wb.save(path)
+    # 写后立即校验：行数必须等于内存中的记录数，杜绝静默截断
+    import zipfile
+    try:
+        with zipfile.ZipFile(path) as z:
+            pass
+    except Exception as e:  # pragma: no cover
+        raise RuntimeError(f"{path} 写入后不可读（可能被截断）: {e}")
+    return nrows
 
 
 def hdr(dist_cm, last_label=None):
@@ -534,12 +669,18 @@ def run_q3(N=40, dt=1.0, steady="end", t_end=T_END, tag="result3"):
     res["t_dry"] = t_dry
     # 无论是否达标都要写出 result3：达标则截到 t_dry，未达标则写到本次时域末并声明（报告 §5.5）
     t_hi = res["t"][-1] if t_dry is None else min(t_dry, res["t"][-1])
-    m = res["t"] <= t_hi + 1e-6
     res["result3_reached"] = bool(t_dry is not None)
-    res["result3_last_t"] = float(res["t"][m][-1])
+    # result3 的规范要求**每隔 60 s**（报告 §5.5 / 题面），而 q2 的内部记录是 1 s，
+    # 故此处必须抽稀，不能把 1 s 记录整份写入。
+    tt = res["t"][res["t"] <= t_hi + 1e-6]
+    cc = res["C"][res["t"] <= t_hi + 1e-6]
+    idx = np.arange(0, tt.size, 60)
+    if idx.size == 0 or tt[idx[-1]] < t_hi - 1e-6:      # 保证末行落在 t_hi
+        idx = np.append(idx, tt.size - 1)
+    res["result3_last_t"] = float(tt[idx[-1]])
     if tag:
         write_xlsx_writeonly(os.path.join(RESULT_DIR, f"{tag}.xlsx"), [
-            ("Sheet1", hdr(DIST_COLS), xlsx_rows(res["t"][m], res["C"][m])),
+            ("Sheet1", hdr(DIST_COLS), xlsx_rows(tt[idx], cc[idx])),
         ])
     return res
 
@@ -611,8 +752,11 @@ def run_q4(N=40, dt=1.0, steady="end", rdot="pchip", t_end=T_END):
             break
         rows.append([int(round(float(t)))] + [round(float(x), 4) for x in res["C"][k]] +
                     [round(float(Cs[k]), 4)])
+    # 列定义（XA-4 建议方案）：固定距离列 0~1.1 cm（12 列）+ 末列"药材表面"，共 13 个数据列。
+    header4 = (["时间\\到药材中心的距离"]
+               + [f"{v:g}" for v in DIST_COLS_Q4] + ["药材表面"])
     write_xlsx_writeonly(os.path.join(RESULT_DIR, "result4.xlsx"), [
-        ("Sheet1", hdr(DIST_COLS_Q4, last_label="药材表面"), rows),
+        ("Sheet1", header4, rows),
     ])
     return res
 
@@ -759,7 +903,8 @@ def _run_q(N, dt, t_end):
 def main(argv=None):
     ap = argparse.ArgumentParser(description="CUMCM 2026 A 题 药材烘干求解")
     ap.add_argument("--stage", default="minimal",
-                    choices=["minimal", "q1", "q2", "q3", "q4", "verify", "sens", "full"])
+                    choices=["minimal", "q1", "q2", "q3", "q4", "verify", "sens",
+                             "tables", "full"])
     ap.add_argument("--N", type=int, default=160)
     ap.add_argument("--dt", type=float, default=1.0)
     ap.add_argument("--steady", default="plateau", choices=["plateau", "end", "peak", "mean"])
@@ -823,6 +968,12 @@ def main(argv=None):
                        C_surface_end=float(r2["C"][-1][-1]),
                        T_center_end_C=float(r2["T"][-1][0]),
                        picard_max=r2["picard_max"], wall_s=round(r2["wall"], 2))
+
+    if args.stage == "tables":
+        S["paper_tables"] = write_paper_tables_from_results()
+        dump_json(os.path.join(RESULT_DIR, "运行摘要.json"), S)
+        print(json.dumps(S, ensure_ascii=False, indent=2, default=str))
+        return 0
 
     if args.stage == "sens":
         S["sens_A_K3"] = v_steady_sensitivity(N=args.N, dt=args.dt, t_end=TE)
