@@ -5,6 +5,7 @@
 .cursor/
 .agent/
 .agent/
+agent/
 
 # Python
 __pycache__/
