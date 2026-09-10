@@ -389,6 +389,8 @@ def solve_1d(cfg: SolverCfg, verbose=False, record_profile=True):
                 trk_t=np.asarray(trk_t), trk_C=np.asarray(trk_C),
                 trk_T=np.asarray(trk_T), trk_R=np.asarray(trk_R),
                 T_final=T.copy(), C_final=C.copy(), R_final=R_new,
+                picard_hist_t=np.arange(1, n_steps + 1) * cfg.dt,   # 每步 Picard 迭代次数（仅记录，不改数值）
+                picard_hist=np.asarray(pic, dtype=float),
                 picard_mean=float(np.mean(pic)), picard_max=int(np.max(pic)),
                 wall=time.time() - tic, n_steps=n_steps)
 

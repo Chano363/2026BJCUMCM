@@ -1,25 +1,15 @@
-ok = False
-issues = 22
-{"severity": "FAIL", "message": "process_q1_gridconv.png ���� 300 DPI"}
-{"severity": "FAIL", "message": "process_q1_picard.png ���� 300 DPI"}
-{"severity": "FAIL", "message": "raw_q1_env_T_C.png ���� 300 DPI"}
-{"severity": "FAIL", "message": "raw_q2_radius.png ���� 300 DPI"}
-{"severity": "FAIL", "message": "result_q1_profile.png ���� 300 DPI"}
-{"severity": "FAIL", "message": "result_q3_q4_combined.png ���� 300 DPI"}
-{"severity": "FAIL", "message": "process_q1_gridconv ȱ����Ը�ʽ��.svg"}
-{"severity": "FAIL", "message": "process_q1_picard ȱ����Ը�ʽ��.svg"}
-{"severity": "FAIL", "message": "raw_q1_env_T_C ȱ����Ը�ʽ��.svg"}
-{"severity": "FAIL", "message": "raw_q2_radius ȱ����Ը�ʽ��.svg"}
-{"severity": "FAIL", "message": "result_q1_profile ȱ����Ը�ʽ��.svg"}
-{"severity": "FAIL", "message": "result_q3_q4_combined ȱ����Ը�ʽ��.svg"}
-{"severity": "FAIL", "message": "raw_ ���ѡͼ�� 2 �ţ�����ÿ����� 3 ��"}
-{"severity": "FAIL", "message": "process_ ���ѡͼ�� 2 �ţ�����ÿ����� 3 ��"}
-{"severity": "FAIL", "message": "result_ ���ѡͼ�� 2 �ţ�����ÿ����� 3 ��"}
-{"severity": "FAIL", "message": "������ q2 ȱ�� process_ ���ѡͼ"}
-{"severity": "FAIL", "message": "������ q2 ȱ�� result_ ���ѡͼ"}
-{"severity": "FAIL", "message": "������ q3 ȱ�� raw_ ���ѡͼ"}
-{"severity": "FAIL", "message": "������ q3 ȱ�� process_ ���ѡͼ"}
-{"severity": "FAIL", "message": "������ q4 ȱ�� raw_ ���ѡͼ"}
-{"severity": "FAIL", "message": "������ q4 ȱ�� process_ ���ѡͼ"}
-{"severity": "FAIL", "message": "������ q4 ȱ�� result_ ���ѡͼ"}
-其他键: []
+  FAIL  process_q1_gridconv.svg û�пɱ༭�ı��ڵ�
+  FAIL  process_q1_picard.svg û�пɱ༭�ı��ڵ�
+  FAIL  process_q2_lag.svg û�пɱ༭�ı��ڵ�
+  FAIL  process_q3_event.svg û�пɱ༭�ı��ڵ�
+  FAIL  process_q4_shrink.svg û�пɱ༭�ı��ڵ�
+  FAIL  raw_q1_env_T_C.svg û�пɱ༭�ı��ڵ�
+  FAIL  raw_q2_radius.svg û�пɱ༭�ı��ڵ�
+  FAIL  raw_q3_q4_params.svg û�пɱ༭�ı��ڵ�
+  FAIL  result_q1_profile.svg û�пɱ༭�ı��ڵ�
+  FAIL  result_q2_field.svg û�пɱ༭�ı��ڵ�
+  FAIL  result_q3_center_surface.svg û�пɱ༭�ı��ڵ�
+  FAIL  result_q3_q4_combined.png ���� 300 DPI
+  FAIL  result_q4_drytime.svg û�пɱ༭�ı��ڵ�
+  FAIL  result_q3_q4_combined ȱ����Ը�ʽ��.svg
+  FAIL  ������ q4 ȱ�� raw_ ���ѡͼ
