@@ -1,0 +1,30 @@
+{
+  "plateau": {
+    "T_steady_C": 49.99566666666669,
+    "C_steady": 0.04999116666666666,
+    "t_dry_h": 55.7397,
+    "reached": true,
+    "C_center_end": 0.1360685386346269,
+    "wall_s": 98.5
+  },
+  "end": {
+    "T_steady_C": 50.16500000000002,
+    "C_steady": 0.04986,
+    "t_dry_h": 55.4391,
+    "reached": true,
+    "C_center_end": 0.1357952871907284,
+    "wall_s": 95.4
+  },
+  "peak": {
+    "T_steady_C": 50.24599999999998,
+    "C_steady": 0.05025,
+    "t_dry_h": 55.3138,
+    "reached": true,
+    "C_center_end": 0.1356814284033896,
+    "wall_s": 128.9
+  },
+  "_spread_h": 0.4259,
+  "_spread_rel": 0.007674,
+  "_criteria": "报告 §5.9 V6：差异 > 10% 时须作为主要不确定性讨论",
+  "_flagged": false
+}
